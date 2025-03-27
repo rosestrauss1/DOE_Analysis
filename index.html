@@ -46,7 +46,7 @@
 
     async function loadData() {
       try {
-        const res = await fetch('https://rosestrauss1.github.io/DOE_Analysis/project_data.json');
+        const res = await fetch('https://rosestrauss1.github.io/clean_projects/project_data.json');
         const rawData = await res.json();
         projectData = rawData
           .filter(p => p.Project && p.Rep && typeof p.Rep === 'string')
