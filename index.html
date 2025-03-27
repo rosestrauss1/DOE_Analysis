@@ -14,7 +14,7 @@
       padding: 2rem;
     }
     h1, h2 {
-      color: #4B0082;
+      color: #2E003E;
       text-align: center;
     }
     select, button {
@@ -26,12 +26,12 @@
       border-radius: 4px;
     }
     button {
-      background-color: #4B0082;
+      background-color: #2E003E;
       color: white;
       cursor: pointer;
     }
     button:hover {
-      background-color: #36005e;
+      background-color: #1f002a;
     }
     .result {
       border: 1px solid #ccc;
@@ -48,7 +48,7 @@
       try {
         const res = await fetch('https://rosestrauss1.github.io/DOE_Analysis/project_data.json');
         projectData = await res.json();
-        projectData = projectData.filter(p => p.Project && p.Rep);
+        projectData = projectData.filter(p => p.Project && p.Rep && typeof p.Rep === 'string' && p.Rep.trim() !== '');
         populateDropdown();
       } catch (err) {
         console.error('Failed to load project data:', err);
@@ -57,7 +57,7 @@
     }
 
     function populateDropdown() {
-      const reps = [...new Set(projectData.map(p => p.Rep).filter(Boolean))].sort();
+      const reps = [...new Set(projectData.map(p => p.Rep.trim()).filter(Boolean))].sort();
       const repSelect = document.getElementById('repSelect');
 
       reps.forEach(rep => {
@@ -70,7 +70,7 @@
 
     function filterProjects() {
       const rep = document.getElementById('repSelect').value;
-      const results = projectData.filter(p => p.Rep === rep);
+      const results = projectData.filter(p => p.Rep && p.Rep.trim() === rep);
 
       const resultsDiv = document.getElementById('results');
       resultsDiv.innerHTML = results.length === 0 ? '<p>No projects found.</p>' :
