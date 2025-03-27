@@ -46,15 +46,25 @@
 
     async function loadData() {
       try {
-        const res = await fetch('https://rosestrauss1.github.io/clean_projects/project_data.json');
+        const res = await fetch('https://rosestrauss1.github.io/clean_projects/project_data.json', {
+          method: 'GET',
+          mode: 'cors'
+        });
+
+        if (!res.ok) {
+          throw new Error(`HTTP error! Status: ${res.status}`);
+        }
+
         const rawData = await res.json();
         projectData = rawData
           .filter(p => p.Project && p.Rep && typeof p.Rep === 'string')
           .map(p => ({ ...p, Rep: p.Rep.trim() }));
+
         populateDropdown();
       } catch (err) {
-        console.error('Failed to load project data:', err);
-        document.getElementById('results').innerHTML = '<p style="color:red;">Failed to load project data.</p>';
+        console.error('⚠️ Error loading project data:', err);
+        const msg = `<p style="color:red;">Failed to load project data. Error: ${err.message}</p>`;
+        document.getElementById('results').innerHTML = msg;
       }
     }
 
