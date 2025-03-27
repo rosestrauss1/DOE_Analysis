@@ -1,33 +1,75 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>District Project Lookup</title>
+  <style>
+    body {
+      font-family: Georgia, serif;
+      background-color: white;
+      color: #1a1a1a;
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    h1, h2 {
+      color: #003366;
+      text-align: center;
+    }
+    select, button {
+      font-size: 1rem;
+      padding: 0.5rem;
+      margin-top: 1rem;
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #003366;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #002244;
+    }
+    .result {
+      border: 1px solid #ccc;
+      padding: 1rem;
+      margin-top: 1rem;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+    }
+  </style>
   <script>
     let projectData = [];
 
     async function loadData() {
       const res = await fetch('https://rosestrauss1.github.io/DOE_Analysis/project_data.json');
       projectData = await res.json();
-      populateDropdowns();
+      populateDropdown();
+    }
+
+    function populateDropdown() {
+      const reps = [...new Set(projectData.map(p => p.Rep).filter(Boolean))].sort();
+      const repSelect = document.getElementById('repSelect');
+
+      reps.forEach(rep => {
+        const opt = document.createElement('option');
+        opt.value = rep;
+        opt.textContent = rep;
+        repSelect.appendChild(opt);
+      });
     }
 
     function filterProjects() {
-      const zip = document.getElementById('zipInput').value.trim();
-      const state = document.getElementById('stateSelect').value;
       const rep = document.getElementById('repSelect').value;
-
-      let results = projectData.filter(p => {
-        return (
-          (zip && p.Zip === zip) ||
-          (state && rep && p.State === state && p.Rep === rep)
-        );
-      });
+      const results = projectData.filter(p => p.Rep === rep);
 
       const resultsDiv = document.getElementById('results');
       resultsDiv.innerHTML = results.length === 0 ? '<p>No projects found.</p>' :
         results.map(p => `
-          <div style="border:1px solid #ccc; margin:10px; padding:10px;">
+          <div class="result">
             <strong>Project:</strong> ${p.Project}<br>
             <strong>Amount:</strong> $${p.Amount}M<br>
             <strong>State:</strong> ${p.State}<br>
@@ -38,46 +80,20 @@
         `).join('');
     }
 
-    function populateDropdowns() {
-      const states = [...new Set(projectData.map(p => p.State).filter(Boolean))];
-      const reps = [...new Set(projectData.map(p => p.Rep).filter(Boolean))];
-      
-      const stateSelect = document.getElementById('stateSelect');
-      const repSelect = document.getElementById('repSelect');
-
-      states.sort().forEach(state => {
-        const opt = document.createElement('option');
-        opt.value = state;
-        opt.textContent = state;
-        stateSelect.appendChild(opt);
-      });
-
-      reps.sort().forEach(rep => {
-        const opt = document.createElement('option');
-        opt.value = rep;
-        opt.textContent = rep;
-        repSelect.appendChild(opt);
-      });
-    }
-
     window.onload = loadData;
   </script>
 </head>
 <body>
-  <h2>Find Projects in Your District</h2>
-  <p>Enter a ZIP code <em>or</em> select your state and representative:</p>
+  <h1>Find Clean Energy Projects</h1>
+  <h2>By Congressional Representative</h2>
 
-  <input id="zipInput" type="text" placeholder="ZIP code (e.g. 94103)">
-  <br><br>
-  <select id="stateSelect">
-    <option value="">-- Select State --</option>
-  </select>
+  <label for="repSelect">Select Representative:</label>
   <select id="repSelect">
-    <option value="">-- Select Representative --</option>
+    <option value="">-- Choose a Representative --</option>
   </select>
-  <br><br>
-  <button onclick="filterProjects()">Search</button>
 
-  <div id="results" style="margin-top:20px;"></div>
+  <button onclick="filterProjects()">Show Projects</button>
+
+  <div id="results"></div>
 </body>
 </html>
