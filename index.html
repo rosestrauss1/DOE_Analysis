@@ -6,7 +6,7 @@
   <title>District Project Lookup</title>
   <style>
     body {
-      font-family: Georgia, serif;
+      font-family: Calibri, sans-serif;
       background-color: white;
       color: #1a1a1a;
       max-width: 700px;
@@ -14,7 +14,7 @@
       padding: 2rem;
     }
     h1, h2 {
-      color: #003366;
+      color: #4B0082;
       text-align: center;
     }
     select, button {
@@ -26,12 +26,12 @@
       border-radius: 4px;
     }
     button {
-      background-color: #003366;
+      background-color: #4B0082;
       color: white;
       cursor: pointer;
     }
     button:hover {
-      background-color: #002244;
+      background-color: #36005e;
     }
     .result {
       border: 1px solid #ccc;
@@ -45,9 +45,15 @@
     let projectData = [];
 
     async function loadData() {
-      const res = await fetch('https://rosestrauss1.github.io/DOE_Analysis/project_data.json');
-      projectData = await res.json();
-      populateDropdown();
+      try {
+        const res = await fetch('https://rosestrauss1.github.io/DOE_Analysis/project_data.json');
+        projectData = await res.json();
+        projectData = projectData.filter(p => p.Project && p.Rep);
+        populateDropdown();
+      } catch (err) {
+        console.error('Failed to load project data:', err);
+        document.getElementById('results').innerHTML = '<p style="color:red;">Failed to load project data.</p>';
+      }
     }
 
     function populateDropdown() {
